@@ -63,6 +63,9 @@ bash $APPCONFIG_PATH/tools/install.sh $subinstall_params
 # install ZOOM
 bash $APPCONFIG_PATH/zoom/install.sh $subinstall_params
 
+# install TEAMS
+bash $APPCONFIG_PATH/teams/install.sh $subinstall_params
+
 sudo apt remove hijra-applet
 sudo apt purge hijra-applet
 
