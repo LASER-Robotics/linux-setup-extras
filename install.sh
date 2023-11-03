@@ -63,6 +63,8 @@ bash $APPCONFIG_PATH/tools/install.sh $subinstall_params
 # install ZOOM
 bash $APPCONFIG_PATH/zoom/install.sh $subinstall_params
 
+sudo apt remove hijra-applet
+sudo apt purge hijra-applet
 
 # finally source the correct rc file
 toilet All Done
