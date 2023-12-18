@@ -46,7 +46,7 @@ bash $APPCONFIG_PATH/dolphin/install.sh $subinstall_params
 sudo cp $APPCONFIG_PATH/dolphin/*.desktop /usr/share/kservices5
 
 # Installing ROS 2
-bash $APPCONFIG_PATH/ros2/install.sh $subinstall_params
+bash $APPCONFIG_PATH/ros2/install.sh
 
 # install GOOGLE CHROME
 bash $APPCONFIG_PATH/chrome/install.sh $subinstall_params

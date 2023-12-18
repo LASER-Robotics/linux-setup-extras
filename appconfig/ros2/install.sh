@@ -1,101 +1,60 @@
 #!/bin/bash
 
-set -e
+#Install ROS2 Humble
+sudo apt update && sudo apt install locales
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+sudo apt install software-properties-common -y
+sudo add-apt-repository universe -y
+sudo apt update && sudo apt install curl -y
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+sudo apt update && sudo apt upgrade -y
+sudo apt install ros-humble-desktop -y
+sudo apt install ros-dev-tools -y
 
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-trap 'echo "$0: \"${last_command}\" command failed with exit code $?"' ERR
+sudo apt install python3-colcon-clean -y
 
+sudo apt install python3-colcon-common-extensions
+sudo apt install ros-humble-eigen3-cmake-module
 
-# get the path to this script
-APP_PATH=`dirname "$0"`
-APP_PATH=`( cd "$APP_PATH" && pwd )`
+pip install --user -U empy pyros-genmsg setuptools
 
-unattended=0
-subinstall_params=""
-for param in "$@"
-do
-  echo $param
-  if [ $param="--unattended" ]; then
-    echo "installing in unattended mode"
-    unattended=1
-    subinstall_params="--unattended"
-  fi
-done
+if [ $(grep -c "/opt/ros/humble/setup.bash" ~/.bashrc) -ne 1 ]; then
+  source /opt/ros/humble/setup.bash && echo -e "\n# source ROS Humble\n source /opt/ros/humble/setup.bash" >> ~/.bashrc
+fi
 
-default=y
-while true; do
-  if [[ "$unattended" == "1" ]]
-  then
-    resp=$default
-  else
-    [[ -t 0 ]] && { read -t 10 -n 2 -p $'\e[1;32mInstall ROS2? [y/n] (default: '"$default"$')\e[0m\n' resp || resp=$default ; }
-  fi
-  response=`echo $resp | sed -r 's/(.*)$/\1=/'`
+if [ $(grep -c "COLCON_LOG_LEVEL" ~/.bashrc) -ne 1 ]; then
+  echo -e "# reduce colcon spam\n export COLCON_LOG_LEVEL=30" >> ~/.bashrc
+fi
 
-  if [[ $response =~ ^(y|Y)=$ ]]
-  then
+if [ $(grep -c "RCUTILS_COLORIZED_OUTPUT" ~/.bashrc) -ne 1 ]; then
+  echo -e "# make logs colorful\n export RCUTILS_COLORIZED_OUTPUT=1" >> ~/.bashrc
+fi
 
-    toilet Installing ROS2
+if [ $(grep -c "RCUTILS_LOGGING_BUFFERED_STREAM" ~/.bashrc) -ne 1 ]; then
+  echo -e "# force logging output to be buffered\n export RCUTILS_LOGGING_BUFFERED_STREAM=1" >> ~/.bashrc
+fi
 
-    distro=`lsb_release -r | awk '{ print $2 }'`
-    [ "$distro" = "22.04" ] && ROS_DISTRO="humble"
+if [ $(grep -c "RCUTILS_CONSOLE_OUTPUT_FORMAT" ~/.bashrc) -ne 1 ]; then
+  echo -e "# format logs in terminal\n export RCUTILS_CONSOLE_OUTPUT_FORMAT='[{severity}] [{time}] [{name}]: {message} ({function_name}() at {file_name}:{line_number})'" >> ~/.bashrc
+fi
 
-    debian=`lsb_release -d | grep -i debian | wc -l`
-    [[ "$debian" -eq "1" ]] && ROS_DISTRO="humble"
+if [ $(grep -c "PYTHONWARNINGS" ~/.bashrc) -ne 1 ]; then
+  echo -e "# reduce depraction warning spam in colcon\n export PYTHONWARNINGS='ignore:::setuptools.command.install,ignore:::setuptools.command.easy_install,ignore:::pkg_resources'" >> ~/.bashrc
+fi
 
-    # Set locale
-    sudo apt update && sudo apt install locales
-    sudo locale-gen en_US en_US.UTF-8
-    sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-    export LANG=en_US.UTF-8
+if [ $(grep -c "ROS_DOMAIN_ID" ~/.bashrc) -ne 1 ]; then
+  resp=0
+  [[ -t 0 ]] && { read -p $'\e[1;32mChoice a number between 46 and 232 for ROS domain ID :\e[0m\n' resp ; }
+  echo -e "# always set ROS domain id\n export ROS_DOMAIN_ID="$resp"" >> ~/.bashrc
+fi
 
-    # ensure that the Ubuntu Universe repository is enabled.
-    sudo apt install software-properties-common
-    sudo add-apt-repository universe
+if [ $(grep -c "ROS_LOCALHOST_ONLY" ~/.bashrc) -ne 1 ]; then
+  echo -e "# always set ROS localhost only\n export ROS_LOCALHOST_ONLY=0" >> ~/.bashrc
+fi
 
-    # add the ROS 2 GPG key with apt
-    sudo apt update && sudo apt install curl
-    sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-
-
-    # add the repository to the sources list.
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
-
-    sudo apt update
-    sudo apt upgrade
-
-    # Desktop Install (Recommended): ROS, RViz, demos, tutorials.
-    sudo apt install ros-humble-desktop
-
-    # Development tools: Compilers and other tools to build ROS packages
-    sudo apt install ros-dev-tools
-
-    # Install Gazebo
-    sudo apt install gazebo
-
-    #############################################
-    # add Source lines to .bashrc
-    #############################################
-
-    num=`cat ~/.bashrc | grep "/opt/ros/$ROS_DISTRO/setup.bash" | wc -l`
-    if [ "$num" -lt "1" ]; then
-
-      # set bashrc
-      sudo echo "
-source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
-      
-      sudo echo "
-source /usr/share/gazebo/setup.sh" >> ~/.bashrc
-
-      echo "Setting lines into .bashrc"
-
-    fi
-
-    break
-  elif [[ $response =~ ^(n|N)=$ ]]
-  then
-    break
-  else
-    echo " What? \"$resp\" is not a correct answer. Try y+Enter."
-  fi
-done
+if [ $(grep -c "RCUTILS_LOGGING_BUFFERED_STREAM" ~/.bashrc) -ne 1 ]; then
+  source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash && echo -e "# colcon tab completion\n source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc
+fi
