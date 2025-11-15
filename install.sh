@@ -39,14 +39,11 @@ then
 fi
 
 # Installing Main Libs
-bash $APPCONFIG_PATH/start/install.sh $subinstall_params
+#bash $APPCONFIG_PATH/start/install.sh $subinstall_params
 
 # install DOLPHIN File Manager
 bash $APPCONFIG_PATH/dolphin/install.sh $subinstall_params
 sudo cp $APPCONFIG_PATH/dolphin/*.desktop /usr/share/kservices5
-
-# Installing ROS 2
-bash $APPCONFIG_PATH/ros2/install.sh
 
 # install GOOGLE CHROME
 bash $APPCONFIG_PATH/chrome/install.sh $subinstall_params
@@ -54,17 +51,17 @@ bash $APPCONFIG_PATH/chrome/install.sh $subinstall_params
 # install SUBLIME
 bash $APPCONFIG_PATH/sublime/install.sh $subinstall_params
 
-# install TWEAK
+3# install TWEAK
 bash $APPCONFIG_PATH/tweak/install.sh $subinstall_params
 
 # install MY TOOLS
-bash $APPCONFIG_PATH/tools/install.sh $subinstall_params
+#bash $APPCONFIG_PATH/tools/install.sh $subinstall_params
 
 # install ZOOM
-bash $APPCONFIG_PATH/zoom/install.sh $subinstall_params
+#bash $APPCONFIG_PATH/zoom/install.sh $subinstall_params
 
 # install TEAMS
-bash $APPCONFIG_PATH/teams/install.sh $subinstall_params
+#bash $APPCONFIG_PATH/teams/install.sh $subinstall_params
 
 sudo apt remove hijra-applet
 sudo apt purge hijra-applet
