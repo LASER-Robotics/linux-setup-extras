@@ -51,8 +51,8 @@ bash $APPCONFIG_PATH/chrome/install.sh $subinstall_params
 # install SUBLIME
 bash $APPCONFIG_PATH/sublime/install.sh $subinstall_params
 
-3# install TWEAK
-bash $APPCONFIG_PATH/tweak/install.sh $subinstall_params
+# install TWEAK
+#bash $APPCONFIG_PATH/tweak/install.sh $subinstall_params
 
 # install MY TOOLS
 #bash $APPCONFIG_PATH/tools/install.sh $subinstall_params
