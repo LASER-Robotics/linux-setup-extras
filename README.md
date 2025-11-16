@@ -27,7 +27,7 @@ To clone and install everything run the following code. **BEWARE**, running this
 
 ```bash
 cd /tmp
-echo "cd ~/mygit
+echo "cd ~/git
 git clone https://github.com/LASER-Robotics/linux-setup-extras.git
 cd linux-setup-extras
 ./install.sh" > run.sh && source run.sh
